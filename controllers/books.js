@@ -29,10 +29,10 @@ exports.findList = async function() {
  * create book
  */
 exports.create = async function(data) {
-  const allBook = await _Books.find({});
-  const find = await this.find(data);
-  let newBook = '';
   try {
+    const allBook = await _Books.find({});
+    const find = await this.find(data);
+    let newBook = '';
     if (!find) {
       data.index = allBook.length;
       newBook = await new _Books(data);

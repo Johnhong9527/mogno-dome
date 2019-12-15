@@ -42,5 +42,5 @@ const BooksSchema = new Schema({
     href: { type: String },
   },
 });
-const Books = mongo.xxxbz.model('Books', BooksSchema);
+const Books = mongo.storybl.model('Books', BooksSchema);
 module.exports = Books;
