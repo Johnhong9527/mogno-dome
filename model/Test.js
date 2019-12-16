@@ -24,11 +24,10 @@ const Schema = mongoose.Schema;
  *     章节名title
  * @type {Schema}
  */
-const BooksSchema = new Schema({
+const TestSchema = new Schema({
   title: { type: String },
   source: { type: String },
   author: { type: String },
-  avatar: { type: String },
   tag: { type: String },
   tag_url: { type: String },
   aid: { type: Number },
@@ -46,5 +45,5 @@ const BooksSchema = new Schema({
     href: { type: String },
   },
 });
-const Books = mongo.xxxbz.model('Books', BooksSchema);
-module.exports = Books;
+const Test = mongo.xxxbz.model('Test', TestSchema);
+module.exports = Test;

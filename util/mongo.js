@@ -3,22 +3,22 @@
 const mongoose = require('mongoose');
 const config = require('../config/index.js');
 // 连接数据库
-const storybl = mongoose.createConnection(config.storybl.url, { useNewUrlParser: true, useUnifiedTopology: true });
-storybl.on('connected', function(err) {
-  if (err) {
-    console.log('连接' + config.storybl.title + '数据库失败：' + err);
-  } else {
-    console.log('连接' + config.storybl.title + '数据库成功！');
-  }
-});
-const xxxbz = mongoose.createConnection(config.xxxbz.url, { useNewUrlParser: true, useUnifiedTopology: true });
-xxxbz.on('connected', function(err) {
-  if (err) {
-    console.log('连接' + config.xxxbz.title + '数据库失败：' + err);
-  } else {
-    console.log('连接' + config.xxxbz.title + '数据库成功！');
-  }
-});
+const storybl = connect('storybl');
+const xxxbz = connect('xxxbz');
+
+function connect(title) {
+  const mongo = mongoose.createConnection(config[title].url, { useNewUrlParser: true, useUnifiedTopology: true });
+  mongo.on('connected', function(err) {
+    if (err) {
+      console.log('连接 ' + title + ' 数据库失败：' + err);
+    } else {
+      console.log('连接 ' + title + ' 数据库成功！');
+    }
+  });
+  mongo.on('error', console.error.bind(console, 'MongoDB ' + title + ' connection error:'));
+  return mongo
+}
+
 module.exports = {
   storybl,
   xxxbz

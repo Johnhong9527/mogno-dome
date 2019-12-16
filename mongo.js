@@ -3,9 +3,11 @@ const _Books = require('./model/books.js');
 const _Storybl = require('./model/storybl.js');
 const _Chapters = require('./model/chapters.js');
 
+
 // createBook()
-createChapter()
-const index = 2;
+// createChapter()
+// const index = 2;
+
 async function createBook() {
   try {
     const storybl = await _Storybl.find({});

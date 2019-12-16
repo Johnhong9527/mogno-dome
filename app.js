@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 // const config = require('./config');
 // 连接mongodb数据库
 // connect(config.storybl);
@@ -8,15 +8,7 @@ const log = require('./util/log');
 const _chapter = require('./controllers/chapter');
 
 const _Books = require('./model/books');
-test();
-async function test() {
-  try {
-    const books = await _Books.find({}, { list: 0 });
-    console.log(books)
-  } catch (e) {
-    console.log('e', e)
-  }
-}
+
 // 所有已经下载小说合集
 // 创建书籍信息
 /**
