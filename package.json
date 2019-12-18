@@ -18,7 +18,9 @@
     "http": "^0.0.0",
     "moment": "^2.24.0",
     "mongoose": "^5.7.12",
+    "progress": "^2.0.3",
     "puppeteer": "^2.0.0",
+    "puppeteer-core": "^2.0.0",
     "querystring": "^0.2.0",
     "request": "^2.88.0",
     "superagent": "^5.1.1"

@@ -93,3 +93,24 @@ mongodump -h ip  -d 数据库名 -o  容器存放备份数据的地址
 ————————————————
 版权声明：本文为CSDN博主「crush1988」的原创文章，遵循 CC 4.0 BY-SA 版权协议，转载请附上原文出处链接及本声明。
 原文链接：https://blog.csdn.net/crush1988/article/details/81019302
+
+
+
+# 数据去重
+
+```
+db.getCollection('chapters').aggregate([
+    {
+        $group:{_id:{title:'$title',href:'href'},count:{$sum:1},dups:{$addToSet:'$_id'}}
+    },
+    {
+        $match:{count:{$gt:1}}
+    }
+
+    ]).forEach(function(it){
+
+         it.dups.shift();
+            db.getCollection('chapters').remove({_id: {$in: it.dups}});
+
+    });
+```
