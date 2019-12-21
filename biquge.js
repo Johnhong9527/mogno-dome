@@ -21,35 +21,42 @@ function pages(data) {
 // 获取小说列表
 async function getBookList(dom) {
   try {
-    return await dom.$$eval('.novelslist2 li', els => Array.from(els).map(el => {
-      if (el.querySelectorAll('.s1')[0].innerText !== '作品分类') {
-        return {
-          tag: el.querySelectorAll('.s1')[0].innerText.replace(/(\[)|(\])/g, ''),
-          tag_url: el.querySelectorAll('.s1 a')[0].href,
-          source: '笔趣阁',
-          aid: Number.parseInt(el.querySelectorAll('.s2 a')[0].href.replace(/.*book\//, '')),
-          title: el.querySelectorAll('.s2')[0].innerText,
-          href: el.querySelectorAll('.s2 a')[0].href,
-          author: el.querySelectorAll('.s4')[0].innerText,
-          lastUpdate: Date.parse(el.querySelectorAll('.s5')[0].innerText) / 1000,
-          status: el.querySelectorAll('.s6')[0].innerText === '完结' ? 1 : 0,
-        };
-      }
-    }));
+    return await dom.$$eval('.novelslist2 li', els =>
+      Array.from(els).map(el => {
+        if (el.querySelectorAll('.s1')[0].innerText !== '作品分类') {
+          return {
+            tag: el
+              .querySelectorAll('.s1')[0]
+              .innerText.replace(/(\[)|(\])/g, ''),
+            tag_url: el.querySelectorAll('.s1 a')[0].href,
+            source: '笔趣阁',
+            aid: Number.parseInt(
+              el.querySelectorAll('.s2 a')[0].href.replace(/.*book\//, ''),
+            ),
+            title: el.querySelectorAll('.s2')[0].innerText,
+            href: el.querySelectorAll('.s2 a')[0].href,
+            author: el.querySelectorAll('.s4')[0].innerText,
+            lastUpdate:
+              Date.parse(el.querySelectorAll('.s5')[0].innerText) / 1000,
+            status: el.querySelectorAll('.s6')[0].innerText === '完结' ? 1 : 0,
+          };
+        }
+      }),
+    );
   } catch (e) {
     console.log(e);
   }
-};
+}
 
 // 存入数据库中
 async function saveBook(data) {
   try {
     for (let i = 0; i < data.length; i++) {
       // 去重
-      const {aid, title} = data[i];
+      const { aid, title } = data[i];
       const isBook = await _Books.find({
         aid,
-        title
+        title,
       });
       console.clear();
       console.log(i);
@@ -60,14 +67,14 @@ async function saveBook(data) {
       // await new
       const newBook = await new _Books({
         index: booksCount,
-        ...data[i]
+        ...data[i],
       });
       await newBook.save();
     }
   } catch (e) {
     console.log(e);
   }
-};
+}
 
 async function getBook() {
   try {
@@ -80,7 +87,7 @@ async function getBook() {
     });
     const page = await browser.newPage();
     await page.goto(URL);
-    await page.setViewport({width: 1280, height: 800});
+    await page.setViewport({ width: 1280, height: 800 });
     // 得到当前页的所有书籍信息元素
     let book_list = await getBookList(page);
     // book_list = book_list.splice(1, book_list.length)
@@ -107,7 +114,7 @@ async function getBook() {
   } catch (e) {
     console.log(e);
   }
-};
+}
 
 // 获取每一本书的章节简介
 // getChapters();
@@ -115,7 +122,7 @@ async function getChapters() {
   try {
     let index = 0;
     // get book list
-    const books = await _Books.find({source: '笔趣阁'});
+    const books = await _Books.find({ source: '笔趣阁' });
     const len = books.length;
     // const len = 1
     // 打开网页
@@ -124,7 +131,7 @@ async function getChapters() {
       timeout: 300000,
     });
     const page = await browser.newPage();
-    await page.setViewport({width: 1280, height: 800});
+    await page.setViewport({ width: 1280, height: 800 });
     await goto();
 
     // 处理获取到的a标签
@@ -148,13 +155,16 @@ async function getChapters() {
             el.aid = books[index].aid;
           })*/
           // 存储结果
-          const update = await _Books.updateOne({aid: books[index].aid, index: books[index].index}, {
-            '$set': {
-              // chapters: chapters,
-              avatar: avatar,
-              intro: intro,
-            }
-          });
+          const update = await _Books.updateOne(
+            { aid: books[index].aid, index: books[index].index },
+            {
+              $set: {
+                // chapters: chapters,
+                avatar: avatar,
+                intro: intro,
+              },
+            },
+          );
           setTimeout(async () => {
             console.log(index);
             // console.log(intro)
@@ -185,14 +195,14 @@ async function getAidCreateBook(aid) {
       timeout: 300000,
     });
     const page = await browser.newPage();
-    await page.setViewport({width: 1280, height: 800});
+    await page.setViewport({ width: 1280, height: 800 });
     await page.goto(book_url);
     const title = await page.$eval('#info h1', el => el.innerText);
 
     // return
     const isCreateBook = true;
     const isSetChapters = true;
-    const books = await _Books.find({aid, title});
+    const books = await _Books.find({ aid, title });
     if (books.length !== 0) {
       console.log('判断是否需要更新书籍信息');
       /*for (let i = 0; i < books.length; i++) {
@@ -209,48 +219,65 @@ async function getAidCreateBook(aid) {
       }*/
     } else {
       // 作者
-      const author = await page.$eval('#info p', el => el.innerText.replace(/作.*者：/, ''));
+      const author = await page.$eval('#info p', el =>
+        el.innerText.replace(/作.*者：/, ''),
+      );
       // avatar
       const avatar = await page.$eval('#fmimg > img', el => el.src);
       // intro
       const intro = await page.$eval('#intro', el => el.innerHTML);
       // status
-      const status = await page.$eval('#info > p:nth-child(3)', el => el.innerText.replace(/(状.*态：)|(,.*)/g, '') === '完结' ? 1 : 0);
+      const status = await page.$eval('#info > p:nth-child(3)', el =>
+        el.innerText.replace(/(状.*态：)|(,.*)/g, '') === '完结' ? 1 : 0,
+      );
       // lastUpdate
-      const lastUpdate = await page.$eval('#info > p:nth-child(4)', el => Date.parse(el.innerText.replace('最后更新：', '')) / 1000);
+      const lastUpdate = await page.$eval(
+        '#info > p:nth-child(4)',
+        el => Date.parse(el.innerText.replace('最后更新：', '')) / 1000,
+      );
       // tag
-      const tag = await page.$eval('#wrapper > div:nth-child(5) > div.con_top > a:nth-child(2)', el => el.innerText);
+      const tag = await page.$eval(
+        '#wrapper > div:nth-child(5) > div.con_top > a:nth-child(2)',
+        el => el.innerText,
+      );
       // tag_url
-      const tag_url = await page.$eval('#wrapper > div:nth-child(5) > div.con_top > a:nth-child(2)', el => el.href);
+      const tag_url = await page.$eval(
+        '#wrapper > div:nth-child(5) > div.con_top > a:nth-child(2)',
+        el => el.href,
+      );
       // source
       const source = '笔趣阁';
       // chapters
-      const chapters = await page.$$eval('#list dd a', els => Array.from(els).map(el => {
-        return {
-          href: el.href,
-          title: el.innerText
-        };
-      }));
+      const chapters = await page.$$eval('#list dd a', els =>
+        Array.from(els).map(el => {
+          return {
+            href: el.href,
+            title: el.innerText,
+          };
+        }),
+      );
 
       chapters.map(el => {
         el.cid = Number.parseInt(el.href.replace(/(.*\/)|(\.html)/g, ''));
         el.aid = aid;
       });
 
-      await saveBook([{
-        chapters,
-        author,
-        avatar,
-        intro,
-        tag,
-        aid,
-        title,
-        href: book_url,
-        tag_url,
-        source,
-        status: status,
-        lastUpdate,
-      }]);
+      await saveBook([
+        {
+          chapters,
+          author,
+          avatar,
+          intro,
+          tag,
+          aid,
+          title,
+          href: book_url,
+          tag_url,
+          source,
+          status: status,
+          lastUpdate,
+        },
+      ]);
     }
     // 关闭浏览器
     await browser.close();
@@ -264,7 +291,6 @@ async function getAidCreateBook(aid) {
 
 async function getPage() {
   try {
-
   } catch (e) {
     console.log(e);
   }
@@ -283,11 +309,9 @@ const arr = [
   'https://www.biquge.com.cn/book/20685/5971316.html',
   'https://www.biquge.com.cn/book/20685/5971317.html',
   'https://www.biquge.com.cn/book/20685/5971318.html',
-
 ];
 
 async function saveChapter() {
-
   try {
     // 打开网页
     const browser = await puppeteer.launch({
@@ -295,14 +319,18 @@ async function saveChapter() {
       timeout: 300000,
     });
     const page = await browser.newPage();
-    await page.setViewport({width: 1280, height: 800});
-    for (let i = 0; i < arr.length;) {
+    await page.setViewport({ width: 1280, height: 800 });
+    for (let i = 0; i < arr.length; ) {
       await page.goto(arr[i]);
-      await page.waitForSelector('#wrapper > div.content_read > div > div.bookname > h1');
-      const title = await page.$eval('#wrapper > div.content_read > div > div.bookname > h1', el => el.innerText);
+      await page.waitForSelector(
+        '#wrapper > div.content_read > div > div.bookname > h1',
+      );
+      const title = await page.$eval(
+        '#wrapper > div.content_read > div > div.bookname > h1',
+        el => el.innerText,
+      );
       const content = await page.$eval('#content', el => el.innerText);
       console.log(i);
-
     }
   } catch (e) {
     console.log(e);
@@ -339,7 +367,7 @@ async function getChapter() {
     process.exit();
     return;*/
 
-    const books = await _Books.find({source: '笔趣阁'});
+    const books = await _Books.find({ source: '笔趣阁' });
     const len = books.length;
     let index = fs.readFileSync('./index', 'utf8');
     index = Number.parseInt(index);
@@ -352,22 +380,30 @@ async function getChapter() {
       timeout: 0,
     });
     const page = await browser.newPage();
-    await page.setViewport({width: 1280, height: 800});
+    await page.setViewport({ width: 1280, height: 800 });
     // goto(require('./dow'));
     goto(books[index].chapters);
 
     async function goto(data) {
       try {
-        const bar = new progress(index + ': [:bar] :current/:total', {total: data.length, width: 50,});
+        const bar = new progress(index + ': [:bar] :current/:total', {
+          total: data.length,
+          width: 50,
+        });
         for (let c = 0; c < data.length; c++) {
-          const {aid, index, cid} = data[c];
-          const oldChapters = await _Chapters.find({aid, cid});
+          const { aid, index, cid } = data[c];
+          const oldChapters = await _Chapters.find({ aid, cid });
           await bar.tick();
           if (oldChapters.length > 0) continue;
           const href = data[c].href;
           await page.goto(href);
-          await page.waitForSelector('#wrapper > div.content_read > div > div.bookname > h1');
-          const title = await page.$eval('#wrapper > div.content_read > div > div.bookname > h1', el => el.innerText);
+          await page.waitForSelector(
+            '#wrapper > div.content_read > div > div.bookname > h1',
+          );
+          const title = await page.$eval(
+            '#wrapper > div.content_read > div > div.bookname > h1',
+            el => el.innerText,
+          );
           const content = await page.$eval('#content', el => el.innerHTML);
           const newBook = await new _Chapters({
             index,
@@ -397,9 +433,9 @@ async function getChapter() {
 }
 
 /*
-* 获取到所有书籍信息
-* 循环提取chapters信息
-* 提取同时去判断章节数据有无下载
-* 没有下载的话，记录该条信息，存到本地中
-*
-* */
+ * 获取到所有书籍信息
+ * 循环提取chapters信息
+ * 提取同时去判断章节数据有无下载
+ * 没有下载的话，记录该条信息，存到本地中
+ *
+ * */
