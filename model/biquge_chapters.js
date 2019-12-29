@@ -12,7 +12,6 @@ const ChapterSchema = new Schema({
 	book_id: { type: String }, // 书籍ID
 	cid: { type: Number }, // 章节ID
 	href: { type: String }, // 章节原地址
-	index: { type: Number }, // 章节索引
 	content: { type: String }, // 章节内容
 });
 const Chapter = mongo.biquge.model('Chapter', ChapterSchema);

@@ -8,13 +8,13 @@ const _Books = require('./model/books.js');
 const _Biquge = require('./model/biquge.js');
 const _Chapters = require('./model/chapters.js');
 const _Biquge_Chapters = require('./model/biquge_chapters.js');
-// create();
+create();
 async function create() {
 	try {
 		let newBook = [];
 		const books = await _Books.find({});
 		for (let i = 0; i < books.length; i++) {
-			if (books[i].source === '笔趣阁') {
+			if (books[i].source === 'boquge') {
 				newBook.push({
 					index: books[i].index,
 					tag: books[i].tag,
@@ -44,10 +44,10 @@ async function create() {
 		console.log(e.message);
 	}
 }
-mvall();
+// mvall();
 async function mvall() {
 	try {
-		const old_books = await _Biquge.find({ source: '笔趣阁' });
+		const old_books = await _Biquge.find({ source: 'boquge' });
 		for (let i = 37; i < old_books.length; i++) {
 			await moveChapter(old_books[i].aid);
 		}
