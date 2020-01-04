@@ -131,6 +131,11 @@ async function books() {
 getChapter();
 
 async function getChapter() {
+	// 打开网页
+	const browser = await puppeteer.launch({
+		headless: false,
+		timeout: 0,
+	});
 	try {
 		const books = await _Biquge.find({ source: 'boquge' });
 		const len = books.length;
@@ -139,11 +144,7 @@ async function getChapter() {
 		index = Number.parseInt(index);
 		cIndex = Number.parseInt(cIndex);
 		let book_id = books[index].open_id;
-		// 打开网页
-		const browser = await puppeteer.launch({
-			headless: false,
-			timeout: 0,
-		});
+
 		const page = await browser.newPage();
 		goto(books[index].chapters);
 		async function goto(data) {
@@ -185,6 +186,8 @@ async function getChapter() {
 				}
 			} catch (e) {
 				if (e.message === 'Navigation timeout of 30000 ms exceeded') {
+					// 关闭浏览器
+					await browser.close();
 					getChapter();
 				} else {
 					console.log('test1', e);
@@ -193,6 +196,8 @@ async function getChapter() {
 		}
 	} catch (e) {
 		if (e.message === 'Navigation timeout of 30000 ms exceeded') {
+			// 关闭浏览器
+			await browser.close();
 			getChapter();
 		} else {
 			console.log('test2', e);
